@@ -54,33 +54,28 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !password || !role) {
+    if (!email || !password) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required!" });
     }
 
     let user = await User.findOne({ email });
-    if (!user)
+    if (!user){
       return res
         .status(400)
         .json({ success: false, message: "Invalid credential!" });
+      }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch)
+    if (!isPasswordMatch){
       return res
         .status(400)
         .json({ success: false, message: "Invalid credential!" });
-
-    // check role is correct or not
-    if (role !== user.role) {
-      return res.status(400).json({
-        success: false,
-        message: "Account doesn't exist with current role.",
-      });
-    }
+      }
+    
 
     const tokenData = {
       userId: user._id,
